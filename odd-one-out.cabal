@@ -5,8 +5,8 @@ name:                odd-one-out
 version:             0.1.0.0
 -- synopsis:            
 -- description:         
-license:             MIT
-license-file:        LICENSE
+--license:             MIT
+--license-file:        LICENSE
 author:              Diego Guerra
 maintainer:          diego.guerra.suarez@gmail.com
 -- copyright:           
@@ -14,7 +14,21 @@ maintainer:          diego.guerra.suarez@gmail.com
 build-type:          Simple
 cabal-version:       >=1.8
 
-executable odd-one-out
-  -- main-is:             
-  -- other-modules:       
+library 
+  Hs-Source-Dirs:      src, .
+  exposed-modules:     OddOneOut
   build-depends:       base ==4.5.*
+
+executable odd-one-out
+  Hs-Source-Dirs:      src, .
+  main-is:             Main.hs
+  -- other-modules:       
+  build-depends:       base ==4.5.*, odd-one-out
+
+Test-suite reference
+  Hs-Source-Dirs:       test, .
+  Main-Is:              OddOneOutTest.hs
+  Type:                 exitcode-stdio-1.0
+
+  Build-Depends:        base ==4.5.*, test-framework, test-framework-hunit, test-framework-quickcheck2,
+                        HUnit, QuickCheck, odd-one-out
