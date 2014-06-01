@@ -34,3 +34,6 @@ propPathsWithExtension :: [String] -> String -> Property
 propPathsWithExtension bs e = not (null bs) ==> not (null e) ==> map base (pathsWithExtension paths e) == bs
   where paths = map (\x -> x ++ e) bs
 
+propFilesFromExtension :: [String] -> [String] -> Property
+propFilesFromExtension bs es = not (null bs) ==> not (null es) ==> length (concatMap id (filesPerExtension bs es)) == (length combined)
+  where combined = concatMap (\b -> map (b++) es) bs
