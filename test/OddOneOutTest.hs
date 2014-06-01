@@ -5,7 +5,6 @@ import Test.Framework.Providers.HUnit
 import Test.Framework.Providers.QuickCheck2
 import Test.HUnit
 import Test.QuickCheck
-import Data.Maybe
 
 main :: IO ()
 main = defaultMain
