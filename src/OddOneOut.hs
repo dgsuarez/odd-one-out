@@ -1,4 +1,4 @@
-module OddOneOut  where
+module OddOneOut where
 
 import Data.List
 import Data.Maybe
@@ -23,13 +23,10 @@ removeSuffix suffix full = if isSuffixOf suffix full
                            else Nothing
 
 pathsWithExtension :: [String] -> String -> [PathWithExtension]
-pathsWithExtension paths ext = map fromJust $ filter isJust $ map (makePathWithExtension ext) $ filter (isSuffixOf ext) paths
+pathsWithExtension paths ext = map fromJust $ filter isJust $ map (\path -> makePathWithExtension path ext) paths
 
 filesPerExtension :: [String] -> [String] -> [[PathWithExtension]]
 filesPerExtension paths extensions = map (pathsWithExtension paths) extensions
-
-baseMatch :: PathWithExtension -> PathWithExtension -> Bool
-baseMatch a b = base a == base b
 
 filterNonPresent :: Eq a => [a] -> [a] -> [a]
 filterNonPresent acc current = filter (\x -> x `notElem` current) acc
