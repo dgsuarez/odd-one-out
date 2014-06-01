@@ -5,28 +5,20 @@ import Test.Framework.Providers.HUnit
 import Test.Framework.Providers.QuickCheck2
 import Test.HUnit
 import Test.QuickCheck
+import Data.Maybe
 
 main :: IO ()
 main = defaultMain
        [ 
-        testGroup "groupIntoExtensionLists" [
-          testProperty "all empty" propEmpty,
-          testProperty "empty extensions" propEmptyExtensions,
-          testProperty "set ext" propSetExtensions,
-          testProperty "same or less files" propFilterFiles
+        testGroup "remove suffix" [
+          testProperty "when suffix" propRemoveSuffix,
+          testProperty "when not suffix" propCantRemoveSuffix
         ]
        ] 
 
-emptyEL :: [ExtensionList]
-emptyEL = []
 
-propEmpty = groupIntoExtensionLists [] [] == emptyEL
+propRemoveSuffix :: String -> String -> Property
+propRemoveSuffix base extension = not (null base) ==> not (null extension) ==> (removeSuffix extension $ base ++ extension) == (Just base)
 
-propEmptyExtensions xs = groupIntoExtensionLists xs [] == emptyEL
-
-propSetExtensions :: [String] -> [[String]] -> Property
-propSetExtensions files extension_groups = not (null extension_groups) ==> map extension_group (groupIntoExtensionLists files extension_groups) == extension_groups
-
-propFilterFiles :: [String] -> [String] -> Property
-propFilterFiles fs extensions = not (null fs) ==> not (null extensions) ==> (length . files) (makeExtensionList fs extensions) <= (length fs)
-
+propCantRemoveSuffix :: String -> String -> Property
+propCantRemoveSuffix base extension = not (null base) ==> not (null extension) ==> (base /= extension) ==> (removeSuffix extension $ extension ++ base) == Nothing
