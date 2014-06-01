@@ -1,7 +1,4 @@
-module OddOneOut (
-  oddOneOut,
-  removeSuffix
-) where
+module OddOneOut  where
 
 import Data.List
 import Data.Maybe
