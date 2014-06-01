@@ -13,6 +13,9 @@ main = defaultMain
         testGroup "remove suffix" [
           testProperty "when suffix" propRemoveSuffix,
           testProperty "when not suffix" propCantRemoveSuffix
+        ],
+        testGroup "path with extension" [
+          testProperty "base from path" propMakePathWithExtension
         ]
        ] 
 
@@ -22,3 +25,6 @@ propRemoveSuffix base extension = not (null base) ==> not (null extension) ==> (
 
 propCantRemoveSuffix :: String -> String -> Property
 propCantRemoveSuffix base extension = not (null base) ==> not (null extension) ==> (base /= extension) ==> (removeSuffix extension $ extension ++ base) == Nothing
+
+propMakePathWithExtension :: String -> String -> Property
+propMakePathWithExtension b e = not (null b) ==> not (null e) ==> (b /= e) ==> (fmap base $ makePathWithExtension (b ++ e) e) == (Just b)
