@@ -6,13 +6,13 @@ import Data.Maybe
 data PathWithExtension = PathWithExtension {
   base :: String,
   extension :: String
-} deriving Eq
-
-instance Show PathWithExtension where
-  show p = (base p) ++ (extension p)
+} deriving (Eq, Show)
 
 oddOneOut :: [String] -> [String] -> [String]
-oddOneOut paths extensions = map show $ foldl1 (\result current -> filterNonPresent result current) (filesPerExtension paths extensions)
+oddOneOut paths extensions = map asFullPath $ foldl1 filterNonPresent (filesPerExtension paths extensions)
+
+asFullPath :: PathWithExtension -> String
+asFullPath p = (base p) ++ (extension p)
 
 makePathWithExtension :: String -> String -> Maybe PathWithExtension
 makePathWithExtension path ext = fmap (\base -> PathWithExtension {base=base, extension=ext}) $ removeSuffix ext path
@@ -28,7 +28,7 @@ pathsWithExtension paths ext = map fromJust $ filter isJust $ map (\path -> make
 filesPerExtension :: [String] -> [String] -> [[PathWithExtension]]
 filesPerExtension paths extensions = map (pathsWithExtension paths) extensions
 
-filterNonPresent :: Eq a => [a] -> [a] -> [a]
-filterNonPresent acc current = filter (\x -> x `notElem` current) acc
-
+filterNonPresent :: [PathWithExtension] -> [PathWithExtension] -> [PathWithExtension]
+filterNonPresent acc current = filter (\x -> (base x) `notElem` currentBases) acc
+  where currentBases = map base current
 

@@ -15,10 +15,17 @@ main = defaultMain
         ],
         testGroup "path with extension" [
           testProperty "base from path" propMakePathWithExtension,
-          testProperty "bases from path" propPathsWithExtension
+          testProperty "bases from path" propPathsWithExtension,
+          testCase "generate all files" testOnePathWithExtension,
+          testCase "generate all files" testMultiplePathsMultipleExtensions
+        ],
+        testGroup "odd one out" [
+          testCase "all there" testNotOneOdd,
+          testCase "one odd" testOneOdd
         ]
        ] 
 
+nonEmptyStrings es =  not (null es) && ((> 0) . length $ es) && (all ((> 0) . length) es)
 
 propRemoveSuffix :: String -> String -> Property
 propRemoveSuffix base extension = not (null base) ==> not (null extension) ==> (removeSuffix extension $ base ++ extension) == (Just base)
@@ -30,8 +37,15 @@ propMakePathWithExtension :: String -> String -> Property
 propMakePathWithExtension b e = not (null b) ==> not (null e) ==> (b /= e) ==> (fmap base $ makePathWithExtension (b ++ e) e) == (Just b)
 
 propPathsWithExtension :: [String] -> String -> Property
-propPathsWithExtension bs e = not (null bs) ==> not (null e) ==> map base (pathsWithExtension paths e) == bs
+propPathsWithExtension bs e = nonEmptyStrings bs ==> not (null e) && ((> 0) . length $ e) ==> map base (pathsWithExtension paths e) == bs
   where paths = map (\x -> x ++ e) bs
 
-propFilesFromExtension :: [String] -> [String] -> Property
-propFilesFromExtension bs es = not (null bs) ==> not (null es) ==> length (concatMap id (filesPerExtension bs es)) == (length bs * length es)
+testOnePathWithExtension = filesPerExtension ["asdf.xa", "asdfasdf.xb"] ["xa"] @?= [[PathWithExtension {base="asdf.", extension="xa"}]]
+
+testMultiplePathsMultipleExtensions = filesPerExtension ["ad.xb", "asdf.xa", "ju.xb"] ["xa", "xb"] @?= res
+  where res = [[PathWithExtension {base="asdf.", extension="xa"}],
+               [PathWithExtension {base="ad.", extension="xb"}, PathWithExtension {base="ju.", extension="xb"}]]
+
+testNotOneOdd = oddOneOut ["a.b", "c.b", "a.a", "c.a"] ["b", "a"] @?= []
+
+testOneOdd = oddOneOut ["a.b", "c.b", "a.a"] ["b", "a"] @?= ["c.b"]
