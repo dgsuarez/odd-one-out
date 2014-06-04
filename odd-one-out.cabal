@@ -23,7 +23,7 @@ executable odd-one-out
   Hs-Source-Dirs:      src, .
   main-is:             Main.hs
   -- other-modules:       
-  build-depends:       base ==4.5.*, odd-one-out
+  build-depends:       base ==4.5.*, regex-compat, odd-one-out
 
 Test-suite reference
   Hs-Source-Dirs:       test, .
