@@ -26,7 +26,9 @@ main = defaultMain
           testCase "one odd" testOneOdd,
           testCase "no extensions" testNoExtensions,
           testCase "all empty" testAllEmpty,
-          testCase "all odd" testAllOdd
+          testCase "all odd" testAllOdd,
+          testCase "multiple extensions" testMultipleExtensionGroups,
+          testCase "multiple misses" testMultipleMissesSameBase
         ]
        ] 
 
@@ -42,21 +44,26 @@ propMakePathWithExtension :: String -> String -> Property
 propMakePathWithExtension b e = not (null b) ==> not (null e) ==> (b /= e) ==> (fmap base $ makePathWithExtension (b ++ e) e) == (Just b)
 
 propPathsWithExtension :: [String] -> String -> Property
-propPathsWithExtension bs e = nonEmptyStrings bs ==> not (null e) && ((> 0) . length $ e) ==> map base (pathsWithExtension paths e) == bs
+propPathsWithExtension bs e = nonEmptyStrings bs ==> not (null e) && ((> 0) . length $ e) ==> map base (pathsWithExtensions paths [e]) == bs
   where paths = map (\x -> x ++ e) bs
 
-testOnePathWithExtension = filesPerExtension ["asdf.xa", "asdfasdf.xb"] ["xa"] @?= [[PathWithExtension {base="asdf.", extension="xa"}]]
+testOnePathWithExtension = filesPerExtensions ["asdf.xa", "asdfasdf.xb"] [["xa"]] @?= [[PathWithExtension {base="asdf.", extension="xa"}]]
 
-testMultiplePathsMultipleExtensions = filesPerExtension ["ad.xb", "asdf.xa", "ju.xb"] ["xa", "xb"] @?= res
+testMultiplePathsMultipleExtensions = filesPerExtensions ["ad.xb", "asdf.xa", "ju.xb"] [["xa"], ["xb"]] @?= res
   where res = [[PathWithExtension {base="asdf.", extension="xa"}],
                [PathWithExtension {base="ad.", extension="xb"}, PathWithExtension {base="ju.", extension="xb"}]]
 
-testNotOneOdd = oddOneOut ["a.b", "c.b", "a.a", "c.a"] ["b", "a"] @?= []
+testNotOneOdd = oddOneOut ["a.b", "c.b", "a.a", "c.a"] [["b"], ["a"]] @?= []
 
-testOneOdd = oddOneOut ["a.b", "c.b", "a.a"] ["b", "a"] @?= ["c.b"]
+testOneOdd = oddOneOut ["a.b", "c.b", "a.a"] [["b"],["a"]] @?= ["c.b"]
 
 testNoExtensions = oddOneOut ["a.b", "a.a", "b.a"] [] @?= []
 
-testAllOdd = oddOneOut ["a.b", "c.b", "a.a"] ["b", "a", "z"] @?= ["a.b", "c.b"]
+testAllOdd = oddOneOut ["a.b", "c.b", "a.a"] [["b"],["a"],["z"]] @?= ["a.b", "c.b"]
 
 testAllEmpty = oddOneOut [] [] @?= []
+
+testMultipleExtensionGroups = oddOneOut ["a.b", "b.c", "b.a", "a.j"] [["b", "c"], ["j"]] @?= ["b.c"]
+
+testMultipleMissesSameBase = oddOneOut ["a.b", "a.c", "b.z"] [["b", "c"], ["z"]] @?= ["a.b", "a.c"]
+
