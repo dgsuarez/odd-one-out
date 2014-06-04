@@ -6,6 +6,8 @@ import Test.Framework.Providers.QuickCheck2
 import Test.HUnit
 import Test.QuickCheck
 
+import Debug.Trace
+
 main :: IO ()
 main = defaultMain
        [ 
@@ -21,7 +23,10 @@ main = defaultMain
         ],
         testGroup "odd one out" [
           testCase "all there" testNotOneOdd,
-          testCase "one odd" testOneOdd
+          testCase "one odd" testOneOdd,
+          testCase "no extensions" testNoExtensions,
+          testCase "all empty" testAllEmpty,
+          testCase "all odd" testAllOdd
         ]
        ] 
 
@@ -49,3 +54,9 @@ testMultiplePathsMultipleExtensions = filesPerExtension ["ad.xb", "asdf.xa", "ju
 testNotOneOdd = oddOneOut ["a.b", "c.b", "a.a", "c.a"] ["b", "a"] @?= []
 
 testOneOdd = oddOneOut ["a.b", "c.b", "a.a"] ["b", "a"] @?= ["c.b"]
+
+testNoExtensions = oddOneOut ["a.b", "a.a", "b.a"] [] @?= []
+
+testAllOdd = oddOneOut ["a.b", "c.b", "a.a"] ["b", "a", "z"] @?= ["a.b", "c.b"]
+
+testAllEmpty = oddOneOut [] [] @?= []

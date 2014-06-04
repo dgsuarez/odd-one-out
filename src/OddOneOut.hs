@@ -9,7 +9,14 @@ data PathWithExtension = PathWithExtension {
 } deriving (Eq, Show)
 
 oddOneOut :: [String] -> [String] -> [String]
-oddOneOut paths extensions = map asFullPath $ foldl1 filterNonPresent (filesPerExtension paths extensions)
+oddOneOut paths extensions = map asFullPath $ onlyInFirstBy base $ filesPerExtension paths extensions
+
+onlyInFirstBy :: Eq b => (a -> b) -> [[a]] -> [a]
+onlyInFirstBy _ [] = []
+onlyInFirstBy extractor (x:xs) = filter (\e -> any (not . (elemBy extractor e)) xs) x
+
+elemBy :: Eq b => (a -> b) -> a -> [a] -> Bool
+elemBy extractor p ps = (extractor p) `elem` (map extractor ps)
 
 asFullPath :: PathWithExtension -> String
 asFullPath p = (base p) ++ (extension p)
@@ -27,8 +34,4 @@ pathsWithExtension paths ext = map fromJust $ filter isJust $ map (\path -> make
 
 filesPerExtension :: [String] -> [String] -> [[PathWithExtension]]
 filesPerExtension paths extensions = map (pathsWithExtension paths) extensions
-
-filterNonPresent :: [PathWithExtension] -> [PathWithExtension] -> [PathWithExtension]
-filterNonPresent acc current = filter (\x -> (base x) `notElem` currentBases) acc
-  where currentBases = map base current
 
