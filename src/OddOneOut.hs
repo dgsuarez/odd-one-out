@@ -33,7 +33,7 @@ removeSuffix suffix full = if isSuffixOf suffix full
                            else Nothing
 
 pathsWithExtensions :: [String] -> [String] -> [PathWithExtension]
-pathsWithExtensions paths exts = map fromJust $ filter isJust $ concatMap (\path -> pathsFromExtensions path exts) paths
+pathsWithExtensions paths exts = catMaybes $ concatMap (\path -> pathsFromExtensions path exts) paths
 
 filesPerExtensions :: [String] -> [[String]] -> [[PathWithExtension]]
 filesPerExtensions paths extensions = map (pathsWithExtensions paths) extensions
