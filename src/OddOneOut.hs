@@ -22,7 +22,9 @@ asFullPath :: PathWithExtension -> String
 asFullPath p = (base p) ++ (extension p)
 
 makePathWithExtension :: String -> String -> Maybe PathWithExtension
-makePathWithExtension path ext = fmap (\base -> PathWithExtension {base=base, extension=ext}) $ removeSuffix ext path
+makePathWithExtension path ext = do 
+  base <- removeSuffix ext path
+  return PathWithExtension {base=base, extension=ext}
 
 pathsFromExtensions :: String -> [String] -> [Maybe PathWithExtension]
 pathsFromExtensions path extensions = map (makePathWithExtension path) extensions
