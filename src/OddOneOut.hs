@@ -13,13 +13,13 @@ oddOneOut paths extensions = map asFullPath $ onlyInFirstBy base $ filesPerExten
 
 onlyInFirstBy :: Eq b => (a -> b) -> [[a]] -> [a]
 onlyInFirstBy _ [] = []
-onlyInFirstBy extractor (x:xs) = filter (\e -> any (not . (elemBy extractor e)) xs) x
+onlyInFirstBy extractor (x:xs) = filter (\e -> any (not . elemBy extractor e) xs) x
 
 elemBy :: Eq b => (a -> b) -> a -> [a] -> Bool
-elemBy extractor p ps = (extractor p) `elem` (map extractor ps)
+elemBy extractor p ps = extractor p `elem` map extractor ps
 
 asFullPath :: PathWithExtension -> String
-asFullPath p = (base p) ++ (extension p)
+asFullPath p = base p ++ extension p
 
 makePathWithExtension :: String -> String -> Maybe PathWithExtension
 makePathWithExtension path ext = do 
@@ -27,16 +27,16 @@ makePathWithExtension path ext = do
   return PathWithExtension {base=base, extension=ext}
 
 pathsFromExtensions :: String -> [String] -> [Maybe PathWithExtension]
-pathsFromExtensions path extensions = map (makePathWithExtension path) extensions
+pathsFromExtensions path = map (makePathWithExtension path) 
 
 removeSuffix :: Eq a => [a] -> [a] -> Maybe [a]
-removeSuffix suffix full = if isSuffixOf suffix full 
-                           then Just $ take ((length full) - (length suffix)) full 
+removeSuffix suffix full = if suffix `isSuffixOf` full 
+                           then Just $ take (length full - length suffix) full 
                            else Nothing
 
 pathsWithExtensions :: [String] -> [String] -> [PathWithExtension]
-pathsWithExtensions paths exts = catMaybes $ concatMap (\path -> pathsFromExtensions path exts) paths
+pathsWithExtensions paths exts = catMaybes $ concatMap (flip pathsFromExtensions exts) paths
 
 filesPerExtensions :: [String] -> [[String]] -> [[PathWithExtension]]
-filesPerExtensions paths extensions = map (pathsWithExtensions paths) extensions
+filesPerExtensions paths = map (pathsWithExtensions paths)
 
